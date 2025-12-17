@@ -12,6 +12,7 @@ router.get("/", (req, res) => {
   res.json(notes);
 });
 
+// sync route to get note by id
 router.get("/:id", (req, res, next) => {
   const note = notes.find(n => n.id === req.params.id);
 
@@ -23,6 +24,8 @@ router.get("/:id", (req, res, next) => {
 
   res.json(note);
 });
+
+//async function to simulate DB call
 
 function getNoteFromDB(id) {
   return new Promise((resolve, reject) => {
@@ -43,9 +46,15 @@ function getNoteFromDB(id) {
   });
 }
 
-router.get("/async-notes/:id", async (req, res) => {
-  const note = await getNoteFromDB(req.params.id);
-  res.json(note);
+router.get("/async-notes/:id", async (req, res,next) => {
+  try {
+    const note = await getNoteFromDB(req.params.id);
+    //await notes.find({id:1});
+    res.json(note);
+  } catch (err) {
+    err.status = 404;
+    next(err);
+  }
 });
 
 export default router;
